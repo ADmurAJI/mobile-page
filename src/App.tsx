@@ -1,16 +1,17 @@
-import React from 'react';
-import { Typography, Container, Box } from '@mui/material';
-import './App.css';
+import { CssBaseline, ThemeProvider } from '@mui/material'
+import { AppLayout } from './app/AppLayout'
+
+import { theme } from './app/theme/theme'
+import { ExchangePage } from './pages/ExchangePage'
 
 function App() {
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ my: 4 }}>
-        <Typography variant="h2" component="h1" gutterBottom>
-          HelloWorld
-        </Typography>
-      </Box>
-    </Container>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <AppLayout>
+        <ExchangePage />
+      </AppLayout>
+    </ThemeProvider>
   );
 }
 
