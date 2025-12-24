@@ -6,14 +6,12 @@ import { BankCard } from '../components/BankCard'
 import { RequisitesSection } from '../components/requisites/RequisitesSection'
 import { SegmentedTabs } from '../components/SegmentedTabs'
 
-import { AMOUNT_ITEMS } from './mock'
-
 export function ExchangePage() {
 	return (
 		<Box>
 			<SegmentedTabs />
 			<BankCard />
-			<AmountSection items={AMOUNT_ITEMS} />
+			<AmountSection />
 			<SliderRow />
 			<RequisitesSection />
 		</Box>

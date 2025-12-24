@@ -1,20 +1,108 @@
 import { Box, Paper, Typography } from '@mui/material'
+import { ChangeEvent, useRef } from 'react'
 import { CircleButton } from './CircleButton'
 
-interface Props {
-	asset: string
-	value: string
-	active?: boolean
+interface AmountInputProps {
+	assetLabel: string
+	inputValue: string
+	isActive?: boolean
+	
+	minValue: number
+	maxValue: number
+	stepValue: number
+	decimalPrecision: number
+	
+	onInputChange: (value: string) => void
+	onValueCommit: (value: number) => void
+	onInputFocus: () => void
 }
 
-export function AmountInput({ asset, value, active }: Props) {
+export function AmountInput({
+	                            assetLabel,
+	                            inputValue,
+	                            isActive,
+	                            minValue,
+	                            maxValue,
+	                            stepValue,
+	                            decimalPrecision,
+	                            onInputChange,
+	                            onValueCommit,
+	                            onInputFocus,
+                            }: AmountInputProps) {
+	const lastCommittedValueRef = useRef<number | null>(null)
+	
+	const clampValue = (value: number) =>
+		Math.min(Math.max(value, minValue), maxValue)
+	
+	const applyDecimalPrecision = (value: number) =>
+		decimalPrecision > 0
+			? Number(value.toFixed(decimalPrecision))
+			: value
+	
+	const normalizeInputValue = (value: string) => {
+		if (!/^\d*\.?\d*$/.test(value)) return null
+		
+		if (decimalPrecision > 0 && value.includes('.')) {
+			const [integerPart, fractionalPart] = value.split('.')
+			return `${integerPart}.${fractionalPart.slice(0, decimalPrecision)}`
+		}
+		
+		return value
+	}
+	
+	const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+		const normalizedValue = normalizeInputValue(event.target.value)
+		if (normalizedValue === null) return
+		onInputChange(normalizedValue)
+	}
+	
+	const handleInputBlur = () => {
+		if (inputValue === '' || inputValue === '.') {
+			if (lastCommittedValueRef.current !== minValue) {
+				lastCommittedValueRef.current = minValue
+				onInputChange(String(minValue))
+				onValueCommit(minValue)
+			}
+			return
+		}
+		
+		const numericValue = clampValue(Number(inputValue))
+		if (Number.isNaN(numericValue)) return
+		
+		if (lastCommittedValueRef.current === numericValue) return
+		
+		lastCommittedValueRef.current = numericValue
+		onInputChange(String(numericValue))
+		onValueCommit(numericValue)
+	}
+	
+	const currentNumericValue = Number(inputValue) || 0
+	
+	const increaseValue = () => {
+		const nextValue = clampValue(
+			applyDecimalPrecision(currentNumericValue + stepValue),
+		)
+		lastCommittedValueRef.current = nextValue
+		onInputChange(String(nextValue))
+		onValueCommit(nextValue)
+	}
+	
+	const decreaseValue = () => {
+		const nextValue = clampValue(
+			applyDecimalPrecision(currentNumericValue - stepValue),
+		)
+		lastCommittedValueRef.current = nextValue
+		onInputChange(String(nextValue))
+		onValueCommit(nextValue)
+	}
+	
 	return (
 		<Box width="100%">
 			<Box
 				sx={(theme) => ({
 					width: '100%',
 					borderRadius: 1,
-					border: active
+					border: isActive
 						? `3px solid ${theme.palette.info.main}`
 						: '3px solid transparent',
 				})}
@@ -27,15 +115,18 @@ export function AmountInput({ asset, value, active }: Props) {
 					})}
 				>
 					<Typography variant="body2" align="center">
-						{asset}
+						{assetLabel}
 					</Typography>
 					
 					<Box display="flex" alignItems="center">
-						<CircleButton>−</CircleButton>
+						<CircleButton onClick={decreaseValue}>−</CircleButton>
 						
 						<input
-							readOnly
-							value={value}
+							value={inputValue}
+							onChange={handleInputChange}
+							onBlur={handleInputBlur}
+							onFocus={onInputFocus}
+							inputMode="decimal"
 							style={{
 								flex: 1,
 								minWidth: 0,
@@ -50,7 +141,7 @@ export function AmountInput({ asset, value, active }: Props) {
 							}}
 						/>
 						
-						<CircleButton>+</CircleButton>
+						<CircleButton onClick={increaseValue}>+</CircleButton>
 					</Box>
 				</Paper>
 			</Box>

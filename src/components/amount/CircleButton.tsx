@@ -2,11 +2,13 @@ import { Box } from '@mui/material'
 
 interface Props {
 	children: string
+	onClick?: () => void
 }
 
-export function CircleButton({ children }: Props) {
+export function CircleButton({ children, onClick }: Props) {
 	return (
 		<Box
+			onClick={onClick}
 			sx={(theme) => ({
 				width: 'clamp(20px, 6vw, 26px)',
 				height: 'clamp(20px, 6vw, 26px)',
@@ -17,6 +19,7 @@ export function CircleButton({ children }: Props) {
 				justifyContent: 'center',
 				flex: '0 0 auto',
 				cursor: 'pointer',
+				userSelect: 'none',
 			})}
 		>
 			<Box
