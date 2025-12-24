@@ -28,7 +28,7 @@ export function AmountSection() {
 			>
 				<Box width="100%" minWidth={0}>
 					<Typography variant="body2" sx={{ mb: 0.75 }}>
-						Отдаёте
+						Отдаете (лот 1000)
 					</Typography>
 					
 					<AmountInput
@@ -50,7 +50,7 @@ export function AmountSection() {
 						variant="body2"
 						sx={{ mb: 0.75, textAlign: 'right' }}
 					>
-						Получаете
+						Получаете (лот 1000)
 					</Typography>
 					
 					<AmountInput
